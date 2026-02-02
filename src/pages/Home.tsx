@@ -46,7 +46,7 @@ const PREDEFINED_QUESTIONS = [
 const WELCOME_MESSAGE: Message = {
   id: 'welcome',
   role: 'assistant',
-  content: 'Welcome to Lyzr Documentation Assistant! I can help you find information about the Lyzr platform, tutorials, API documentation, and getting started guides. Ask me anything!',
+  content: 'Welcome to Lyzr Support Agent! I can help you find information about the Lyzr platform, tutorials, API documentation, and getting started guides. Ask me anything!',
   timestamp: new Date().toISOString(),
 }
 
@@ -72,7 +72,7 @@ function Header() {
     <header className="bg-[#27272A] border-b border-[#3f3f46] px-6 py-4 flex items-center gap-4">
       <img src={LOGO_URL} alt="Lyzr Logo" className="h-8 w-auto" />
       <h1 className="text-xl font-semibold text-[#F3EFEA] font-inter">
-        Documentation Assistant
+        Support Agent
       </h1>
     </header>
   )
@@ -318,7 +318,7 @@ export default function Home() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 disabled={isLoading}
-                className="flex-1 bg-[#18181B] border-[#3f3f46] text-[#F3EFEA] placeholder:text-[#F3EFEA]/40 focus-visible:ring-[#F3EFEA]/20"
+                className="flex-1 bg-[#27272A] border-[#3f3f46] text-[#F3EFEA] placeholder:text-[#F3EFEA]/40 focus-visible:ring-[#F3EFEA]/20"
               />
               <Button
                 type="submit"
