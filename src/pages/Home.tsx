@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
-import { Loader2, Send } from 'lucide-react'
+import { Loader2, Send, Plus, MessageSquare } from 'lucide-react'
 import { callAIAgent } from '@/utils/aiAgent'
 import type { NormalizedAgentResponse } from '@/utils/aiAgent'
 
@@ -26,6 +26,13 @@ interface Message {
   sources?: string[]
   confidence?: number
   suggestedAction?: string
+}
+
+interface Conversation {
+  id: string
+  title: string
+  timestamp: number
+  messages: Message[]
 }
 
 // =============================================================================
@@ -59,8 +66,59 @@ function formatTime(timestamp: string): string {
   return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
 }
 
+function formatRelativeTime(timestamp: number): string {
+  const now = Date.now()
+  const diff = now - timestamp
+  const seconds = Math.floor(diff / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
+
+  if (seconds < 60) return 'Just now'
+  if (minutes < 60) return `${minutes}m ago`
+  if (hours < 24) return `${hours}h ago`
+  if (days === 1) return 'Yesterday'
+  if (days < 7) return `${days}d ago`
+
+  const date = new Date(timestamp)
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
 function generateId(): string {
   return `msg-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
+}
+
+function generateConversationTitle(firstMessage: string): string {
+  const maxLength = 30
+  const trimmed = firstMessage.trim()
+  if (trimmed.length <= maxLength) return trimmed
+  return trimmed.substring(0, maxLength) + '...'
+}
+
+// =============================================================================
+// LocalStorage Functions
+// =============================================================================
+
+const STORAGE_KEY = 'lyzr-support-conversations'
+
+function loadConversations(): Conversation[] {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (stored) {
+      return JSON.parse(stored)
+    }
+  } catch (err) {
+    console.error('Failed to load conversations:', err)
+  }
+  return []
+}
+
+function saveConversations(conversations: Conversation[]): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations))
+  } catch (err) {
+    console.error('Failed to save conversations:', err)
+  }
 }
 
 // =============================================================================
@@ -69,9 +127,9 @@ function generateId(): string {
 
 function Header() {
   return (
-    <header className="bg-[#27272A] border-b border-[#3f3f46] px-6 py-4 flex items-center gap-4">
+    <header className="bg-[#4A2F2D] border-b border-[#5a3f3d] px-6 py-4 flex items-center gap-4">
       <img src={LOGO_URL} alt="Lyzr Logo" className="h-8 w-auto" />
-      <h1 className="text-xl font-semibold text-[#F3EFEA] font-inter">
+      <h1 className="text-xl font-semibold text-[#E3D0C2] font-inter">
         Support Agent
       </h1>
     </header>
@@ -86,8 +144,8 @@ function MessageBubble({ message }: { message: Message }) {
       <div
         className={`max-w-[80%] rounded-lg px-4 py-3 ${
           isUser
-            ? 'bg-[#F3EFEA] text-[#27272A]'
-            : 'bg-[#27272A] text-[#F3EFEA] border border-[#3f3f46]'
+            ? 'bg-[#E3D0C2] text-[#4A2F2D]'
+            : 'bg-[#4A2F2D] text-[#E3D0C2] border border-[#5a3f3d]'
         }`}
       >
         <div className="whitespace-pre-wrap break-words">{message.content}</div>
@@ -95,14 +153,14 @@ function MessageBubble({ message }: { message: Message }) {
         {/* Sources - only for assistant messages */}
         {!isUser && message.sources && message.sources.length > 0 && (
           <div className="mt-3 space-y-1">
-            <div className="text-xs text-[#F3EFEA]/60 font-medium">Sources:</div>
+            <div className="text-xs text-[#E3D0C2]/60 font-medium">Sources:</div>
             {message.sources.map((source, idx) => (
               <a
                 key={idx}
                 href={source}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block text-sm text-[#F3EFEA] underline hover:text-[#F3EFEA]/80 transition-colors"
+                className="block text-sm text-[#E3D0C2] underline hover:text-[#E3D0C2]/80 transition-colors"
               >
                 {source}
               </a>
@@ -115,7 +173,7 @@ function MessageBubble({ message }: { message: Message }) {
           <div className="mt-2">
             <Badge
               variant="outline"
-              className="bg-[#F3EFEA]/10 text-[#F3EFEA] border-[#F3EFEA]/20 text-xs"
+              className="bg-[#E3D0C2]/10 text-[#E3D0C2] border-[#E3D0C2]/20 text-xs"
             >
               Confidence: {Math.round(message.confidence * 100)}%
             </Badge>
@@ -124,16 +182,16 @@ function MessageBubble({ message }: { message: Message }) {
 
         {/* Suggested action - only for assistant messages */}
         {!isUser && message.suggestedAction && (
-          <div className="mt-3 pt-3 border-t border-[#F3EFEA]/10">
-            <div className="text-xs text-[#F3EFEA]/60 font-medium mb-1">
+          <div className="mt-3 pt-3 border-t border-[#E3D0C2]/10">
+            <div className="text-xs text-[#E3D0C2]/60 font-medium mb-1">
               Suggested Next Step:
             </div>
-            <div className="text-sm text-[#F3EFEA]/90">{message.suggestedAction}</div>
+            <div className="text-sm text-[#E3D0C2]/90">{message.suggestedAction}</div>
           </div>
         )}
 
         {/* Timestamp */}
-        <div className={`text-xs mt-2 ${isUser ? 'text-[#27272A]/60' : 'text-[#F3EFEA]/40'}`}>
+        <div className={`text-xs mt-2 ${isUser ? 'text-[#4A2F2D]/60' : 'text-[#E3D0C2]/40'}`}>
           {formatTime(message.timestamp)}
         </div>
       </div>
@@ -144,7 +202,7 @@ function MessageBubble({ message }: { message: Message }) {
 function TypingIndicator() {
   return (
     <div className="flex justify-start mb-4">
-      <div className="max-w-[80%] rounded-lg px-4 py-3 bg-[#27272A] text-[#F3EFEA] border border-[#3f3f46]">
+      <div className="max-w-[80%] rounded-lg px-4 py-3 bg-[#4A2F2D] text-[#E3D0C2] border border-[#5a3f3d]">
         <div className="flex items-center gap-2">
           <Loader2 className="h-4 w-4 animate-spin" />
           <span className="text-sm">Searching documentation...</span>
@@ -158,7 +216,7 @@ function QuestionChip({ question, onClick }: { question: string; onClick: () => 
   return (
     <button
       onClick={onClick}
-      className="flex-shrink-0 px-4 py-2 rounded-full border border-[#F3EFEA] text-[#F3EFEA] text-sm bg-[#27272A] hover:bg-[#F3EFEA] hover:text-[#27272A] transition-all duration-200 font-inter whitespace-nowrap"
+      className="flex-shrink-0 px-4 py-2 rounded-full border border-[#E3D0C2] text-[#E3D0C2] text-sm bg-[#4A2F2D] hover:bg-[#E3D0C2] hover:text-[#4A2F2D] transition-all duration-200 font-inter whitespace-nowrap"
     >
       {question}
     </button>
@@ -180,11 +238,48 @@ function ErrorMessage({ message }: { message: string }) {
   )
 }
 
+function ConversationItem({
+  conversation,
+  isActive,
+  onClick,
+}: {
+  conversation: Conversation
+  isActive: boolean
+  onClick: () => void
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 group ${
+        isActive
+          ? 'bg-[#E3D0C2] text-[#4A2F2D]'
+          : 'bg-[#4A2F2D] text-[#E3D0C2] hover:bg-[#5a3f3d]'
+      }`}
+    >
+      <div className="flex items-start gap-2">
+        <MessageSquare className="h-4 w-4 mt-0.5 flex-shrink-0" />
+        <div className="flex-1 min-w-0">
+          <div className="text-sm font-medium truncate">{conversation.title}</div>
+          <div
+            className={`text-xs mt-1 ${
+              isActive ? 'text-[#4A2F2D]/60' : 'text-[#E3D0C2]/50'
+            }`}
+          >
+            {formatRelativeTime(conversation.timestamp)}
+          </div>
+        </div>
+      </div>
+    </button>
+  )
+}
+
 // =============================================================================
 // Main Component
 // =============================================================================
 
 export default function Home() {
+  const [conversations, setConversations] = useState<Conversation[]>(() => loadConversations())
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([WELCOME_MESSAGE])
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -197,8 +292,69 @@ export default function Home() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, isLoading])
 
+  // Save current conversation to localStorage whenever messages change
+  useEffect(() => {
+    if (currentConversationId && messages.length > 1) {
+      const updatedConversations = conversations.map((conv) => {
+        if (conv.id === currentConversationId) {
+          return {
+            ...conv,
+            messages,
+            timestamp: Date.now(),
+            title: conv.title === 'New Chat' && messages.length > 1
+              ? generateConversationTitle(messages.find(m => m.role === 'user')?.content || 'New Chat')
+              : conv.title,
+          }
+        }
+        return conv
+      })
+
+      setConversations(updatedConversations)
+      saveConversations(updatedConversations)
+    }
+  }, [messages, currentConversationId])
+
+  const createNewChat = () => {
+    const newConversation: Conversation = {
+      id: `conv-${Date.now()}`,
+      title: 'New Chat',
+      timestamp: Date.now(),
+      messages: [WELCOME_MESSAGE],
+    }
+
+    const updatedConversations = [newConversation, ...conversations]
+    setConversations(updatedConversations)
+    saveConversations(updatedConversations)
+    setCurrentConversationId(newConversation.id)
+    setMessages([WELCOME_MESSAGE])
+    setError(null)
+  }
+
+  const loadConversation = (conversationId: string) => {
+    const conversation = conversations.find((c) => c.id === conversationId)
+    if (conversation) {
+      setCurrentConversationId(conversationId)
+      setMessages(conversation.messages)
+      setError(null)
+    }
+  }
+
   const handleSendMessage = async (messageText: string) => {
     if (!messageText.trim() || isLoading) return
+
+    // If no active conversation, create one
+    if (!currentConversationId) {
+      const newConversation: Conversation = {
+        id: `conv-${Date.now()}`,
+        title: generateConversationTitle(messageText),
+        timestamp: Date.now(),
+        messages: [WELCOME_MESSAGE],
+      }
+      const updatedConversations = [newConversation, ...conversations]
+      setConversations(updatedConversations)
+      saveConversations(updatedConversations)
+      setCurrentConversationId(newConversation.id)
+    }
 
     const userMessage: Message = {
       id: generateId(),
@@ -271,67 +427,111 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-[#27272A] flex flex-col font-inter">
+    <div className="min-h-screen bg-[#4A2F2D] flex flex-col font-inter">
       {/* Header */}
       <Header />
 
-      {/* Chat Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <ScrollArea className="flex-1 px-6 py-4" ref={scrollAreaRef}>
-          <div className="max-w-4xl mx-auto">
-            {messages.map((message) => (
-              <MessageBubble key={message.id} message={message} />
-            ))}
-
-            {isLoading && <TypingIndicator />}
-
-            {error && !isLoading && <ErrorMessage message={error} />}
-
-            <div ref={messagesEndRef} />
+      {/* Main Content Area - Sidebar + Chat */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Conversation History Sidebar */}
+        <aside className="w-64 bg-[#3a241f] border-r border-[#5a3f3d] flex flex-col">
+          {/* New Chat Button */}
+          <div className="p-4 border-b border-[#5a3f3d]">
+            <Button
+              onClick={createNewChat}
+              className="w-full bg-[#E3D0C2] text-[#4A2F2D] hover:bg-[#E3D0C2]/90 flex items-center justify-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              New Chat
+            </Button>
           </div>
-        </ScrollArea>
 
-        {/* Predefined Questions */}
-        <div className="px-6 py-3 bg-[#27272A] border-t border-[#3f3f46]">
-          <div className="max-w-4xl mx-auto">
-            <ScrollArea className="w-full" orientation="horizontal">
-              <div className="flex gap-2 pb-2">
-                {PREDEFINED_QUESTIONS.map((question, idx) => (
-                  <QuestionChip
-                    key={idx}
-                    question={question}
-                    onClick={() => handleQuestionClick(question)}
+          {/* History Header */}
+          <div className="px-4 py-3 border-b border-[#5a3f3d]">
+            <h2 className="text-sm font-semibold text-[#E3D0C2] uppercase tracking-wide">
+              Conversation History
+            </h2>
+          </div>
+
+          {/* Conversation List */}
+          <ScrollArea className="flex-1">
+            <div className="p-2 space-y-1">
+              {conversations.length === 0 ? (
+                <div className="px-4 py-8 text-center text-[#E3D0C2]/50 text-sm">
+                  No conversations yet.<br />Start a new chat!
+                </div>
+              ) : (
+                conversations.map((conversation) => (
+                  <ConversationItem
+                    key={conversation.id}
+                    conversation={conversation}
+                    isActive={conversation.id === currentConversationId}
+                    onClick={() => loadConversation(conversation.id)}
                   />
-                ))}
-              </div>
-            </ScrollArea>
-          </div>
-        </div>
+                ))
+              )}
+            </div>
+          </ScrollArea>
+        </aside>
 
-        {/* Input Bar */}
-        <div className="px-6 py-4 bg-[#27272A] border-t border-[#3f3f46]">
-          <div className="max-w-4xl mx-auto">
-            <form onSubmit={handleFormSubmit} className="flex gap-3">
-              <Input
-                type="text"
-                placeholder="Ask a question about Lyzr..."
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                disabled={isLoading}
-                className="flex-1 bg-[#27272A] border-[#3f3f46] text-[#F3EFEA] placeholder:text-[#F3EFEA]/40 focus-visible:ring-[#F3EFEA]/20"
-              />
-              <Button
-                type="submit"
-                disabled={isLoading || !inputValue.trim()}
-                className="bg-[#F3EFEA] text-[#27272A] hover:bg-[#F3EFEA]/90"
-              >
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Send className="h-4 w-4" />
-                )}
-              </Button>
-            </form>
+        {/* Main Chat Area */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <ScrollArea className="flex-1 px-6 py-4" ref={scrollAreaRef}>
+            <div className="max-w-4xl mx-auto">
+              {messages.map((message) => (
+                <MessageBubble key={message.id} message={message} />
+              ))}
+
+              {isLoading && <TypingIndicator />}
+
+              {error && !isLoading && <ErrorMessage message={error} />}
+
+              <div ref={messagesEndRef} />
+            </div>
+          </ScrollArea>
+
+          {/* Predefined Questions */}
+          <div className="px-6 py-3 bg-[#4A2F2D] border-t border-[#5a3f3d]">
+            <div className="max-w-4xl mx-auto">
+              <ScrollArea className="w-full" orientation="horizontal">
+                <div className="flex gap-2 pb-2">
+                  {PREDEFINED_QUESTIONS.map((question, idx) => (
+                    <QuestionChip
+                      key={idx}
+                      question={question}
+                      onClick={() => handleQuestionClick(question)}
+                    />
+                  ))}
+                </div>
+              </ScrollArea>
+            </div>
+          </div>
+
+          {/* Input Bar */}
+          <div className="px-6 py-4 bg-[#4A2F2D] border-t border-[#5a3f3d]">
+            <div className="max-w-4xl mx-auto">
+              <form onSubmit={handleFormSubmit} className="flex gap-3">
+                <Input
+                  type="text"
+                  placeholder="Ask a question about Lyzr..."
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  disabled={isLoading}
+                  className="flex-1 bg-[#4A2F2D] border-[#5a3f3d] text-[#E3D0C2] placeholder:text-[#E3D0C2]/40 focus-visible:ring-[#E3D0C2]/20"
+                />
+                <Button
+                  type="submit"
+                  disabled={isLoading || !inputValue.trim()}
+                  className="bg-[#E3D0C2] text-[#4A2F2D] hover:bg-[#E3D0C2]/90"
+                >
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
+                </Button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
