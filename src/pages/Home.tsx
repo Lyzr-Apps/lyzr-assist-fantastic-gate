@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
-import { Loader2, Send, Plus, MessageSquare } from 'lucide-react'
+import { Loader2, Send, Plus, MessageSquare, User } from 'lucide-react'
 import { callAIAgent } from '@/utils/aiAgent'
 import type { NormalizedAgentResponse } from '@/utils/aiAgent'
 
@@ -127,11 +127,24 @@ function saveConversations(conversations: Conversation[]): void {
 
 function Header() {
   return (
-    <header className="bg-[#4A2F2D] border-b border-[#5a3f3d] px-6 py-4 flex items-center gap-4">
-      <img src={LOGO_URL} alt="Lyzr Logo" className="h-8 w-auto" />
-      <h1 className="text-xl font-semibold text-[#E3D0C2] font-inter">
-        Support Agent
-      </h1>
+    <header className="bg-[#4A2F2D] border-b border-[#5a3f3d] px-6 py-4 flex items-center justify-between">
+      {/* Left: Logo and Title */}
+      <div className="flex items-center gap-4">
+        <img src={LOGO_URL} alt="Lyzr Logo" className="h-8 w-auto" />
+        <h1 className="text-xl font-semibold text-white font-inter">
+          Support Agent
+        </h1>
+      </div>
+
+      {/* Right: User Account Section */}
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#27272A] hover:bg-[#27272A]/80 transition-colors cursor-pointer">
+          <div className="w-8 h-8 rounded-full bg-[#4A2F2D] flex items-center justify-center">
+            <User className="h-4 w-4 text-white" />
+          </div>
+          <span className="text-sm font-medium text-white">User</span>
+        </div>
+      </div>
     </header>
   )
 }
@@ -144,8 +157,8 @@ function MessageBubble({ message }: { message: Message }) {
       <div
         className={`max-w-[80%] rounded-lg px-4 py-3 ${
           isUser
-            ? 'bg-[#E3D0C2] text-[#4A2F2D]'
-            : 'bg-[#4A2F2D] text-[#E3D0C2] border border-[#5a3f3d]'
+            ? 'bg-[#27272A] text-white'
+            : 'bg-[#4A2F2D] text-white border border-[#5a3f3d]'
         }`}
       >
         <div className="whitespace-pre-wrap break-words">{message.content}</div>
@@ -153,14 +166,14 @@ function MessageBubble({ message }: { message: Message }) {
         {/* Sources - only for assistant messages */}
         {!isUser && message.sources && message.sources.length > 0 && (
           <div className="mt-3 space-y-1">
-            <div className="text-xs text-[#E3D0C2]/60 font-medium">Sources:</div>
+            <div className="text-xs text-white/60 font-medium">Sources:</div>
             {message.sources.map((source, idx) => (
               <a
                 key={idx}
                 href={source}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block text-sm text-[#E3D0C2] underline hover:text-[#E3D0C2]/80 transition-colors"
+                className="block text-sm text-white underline hover:text-white/80 transition-colors"
               >
                 {source}
               </a>
@@ -173,7 +186,7 @@ function MessageBubble({ message }: { message: Message }) {
           <div className="mt-2">
             <Badge
               variant="outline"
-              className="bg-[#E3D0C2]/10 text-[#E3D0C2] border-[#E3D0C2]/20 text-xs"
+              className="bg-white/10 text-white border-white/20 text-xs"
             >
               Confidence: {Math.round(message.confidence * 100)}%
             </Badge>
@@ -182,16 +195,16 @@ function MessageBubble({ message }: { message: Message }) {
 
         {/* Suggested action - only for assistant messages */}
         {!isUser && message.suggestedAction && (
-          <div className="mt-3 pt-3 border-t border-[#E3D0C2]/10">
-            <div className="text-xs text-[#E3D0C2]/60 font-medium mb-1">
+          <div className="mt-3 pt-3 border-t border-white/10">
+            <div className="text-xs text-white/60 font-medium mb-1">
               Suggested Next Step:
             </div>
-            <div className="text-sm text-[#E3D0C2]/90">{message.suggestedAction}</div>
+            <div className="text-sm text-white/90">{message.suggestedAction}</div>
           </div>
         )}
 
         {/* Timestamp */}
-        <div className={`text-xs mt-2 ${isUser ? 'text-[#4A2F2D]/60' : 'text-[#E3D0C2]/40'}`}>
+        <div className={`text-xs mt-2 ${isUser ? 'text-white/60' : 'text-white/40'}`}>
           {formatTime(message.timestamp)}
         </div>
       </div>
@@ -202,7 +215,7 @@ function MessageBubble({ message }: { message: Message }) {
 function TypingIndicator() {
   return (
     <div className="flex justify-start mb-4">
-      <div className="max-w-[80%] rounded-lg px-4 py-3 bg-[#4A2F2D] text-[#E3D0C2] border border-[#5a3f3d]">
+      <div className="max-w-[80%] rounded-lg px-4 py-3 bg-[#4A2F2D] text-white border border-[#5a3f3d]">
         <div className="flex items-center gap-2">
           <Loader2 className="h-4 w-4 animate-spin" />
           <span className="text-sm">Searching documentation...</span>
@@ -216,7 +229,7 @@ function QuestionChip({ question, onClick }: { question: string; onClick: () => 
   return (
     <button
       onClick={onClick}
-      className="flex-shrink-0 px-4 py-2 rounded-full border border-[#E3D0C2] text-[#E3D0C2] text-sm bg-[#4A2F2D] hover:bg-[#E3D0C2] hover:text-[#4A2F2D] transition-all duration-200 font-inter whitespace-nowrap"
+      className="flex-shrink-0 px-4 py-2 rounded-full border border-[#27272A] text-white text-sm bg-[#4A2F2D] hover:bg-[#27272A] hover:text-white transition-all duration-200 font-inter whitespace-nowrap"
     >
       {question}
     </button>
@@ -252,8 +265,8 @@ function ConversationItem({
       onClick={onClick}
       className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 group ${
         isActive
-          ? 'bg-[#E3D0C2] text-[#4A2F2D]'
-          : 'bg-[#4A2F2D] text-[#E3D0C2] hover:bg-[#5a3f3d]'
+          ? 'bg-[#27272A] text-white'
+          : 'bg-[#4A2F2D] text-white hover:bg-[#5a3f3d]'
       }`}
     >
       <div className="flex items-start gap-2">
@@ -262,7 +275,7 @@ function ConversationItem({
           <div className="text-sm font-medium truncate">{conversation.title}</div>
           <div
             className={`text-xs mt-1 ${
-              isActive ? 'text-[#4A2F2D]/60' : 'text-[#E3D0C2]/50'
+              isActive ? 'text-white/60' : 'text-white/50'
             }`}
           >
             {formatRelativeTime(conversation.timestamp)}
@@ -439,7 +452,7 @@ export default function Home() {
           <div className="p-4 border-b border-[#5a3f3d]">
             <Button
               onClick={createNewChat}
-              className="w-full bg-[#E3D0C2] text-[#4A2F2D] hover:bg-[#E3D0C2]/90 flex items-center justify-center gap-2"
+              className="w-full bg-[#27272A] text-white hover:bg-[#27272A]/90 flex items-center justify-center gap-2"
             >
               <Plus className="h-4 w-4" />
               New Chat
@@ -448,7 +461,7 @@ export default function Home() {
 
           {/* History Header */}
           <div className="px-4 py-3 border-b border-[#5a3f3d]">
-            <h2 className="text-sm font-semibold text-[#E3D0C2] uppercase tracking-wide">
+            <h2 className="text-sm font-semibold text-white uppercase tracking-wide">
               Conversation History
             </h2>
           </div>
@@ -457,7 +470,7 @@ export default function Home() {
           <ScrollArea className="flex-1">
             <div className="p-2 space-y-1">
               {conversations.length === 0 ? (
-                <div className="px-4 py-8 text-center text-[#E3D0C2]/50 text-sm">
+                <div className="px-4 py-8 text-center text-white/50 text-sm">
                   No conversations yet.<br />Start a new chat!
                 </div>
               ) : (
@@ -517,12 +530,12 @@ export default function Home() {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   disabled={isLoading}
-                  className="flex-1 bg-[#4A2F2D] border-[#5a3f3d] text-[#E3D0C2] placeholder:text-[#E3D0C2]/40 focus-visible:ring-[#E3D0C2]/20"
+                  className="flex-1 bg-[#4A2F2D] border-[#5a3f3d] text-white placeholder:text-white/40 focus-visible:ring-[#27272A]/20"
                 />
                 <Button
                   type="submit"
                   disabled={isLoading || !inputValue.trim()}
-                  className="bg-[#E3D0C2] text-[#4A2F2D] hover:bg-[#E3D0C2]/90"
+                  className="bg-[#27272A] text-white hover:bg-[#27272A]/90"
                 >
                   {isLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
