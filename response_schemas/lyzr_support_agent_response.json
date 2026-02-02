@@ -1,0 +1,54 @@
+{
+  "agent_name": "Lyzr Support Agent",
+  "agent_id": "69809580066158e77fdea161",
+  "agent_purpose": "assistant",
+  "description": "Documentation assistant that answers questions about Lyzr platform with sources and confidence scores",
+  "response_schema": {
+    "status": "string",
+    "result": {
+      "answer": "string",
+      "sources": [
+        "string"
+      ],
+      "confidence": "number",
+      "suggested_action": "string"
+    },
+    "metadata": {
+      "agent_name": "string",
+      "timestamp": "string"
+    }
+  },
+  "example_response": {
+    "status": "success",
+    "result": {
+      "answer": "Here is a sample response from the Lyzr API when you initiate a chat with an agent. For example, if you send a POST request to the chat endpoint with a sample message, you might receive:\n\n{\n  \"response\": \"Hello! How can I assist you today?\"\n}\n\nThis indicates that the agent is ready to engage and provide further assistance based on your queries. For more details on chatting with agents, refer to the official documentation.",
+      "sources": [
+        "https://docs.lyzr.ai/agent-apis/agents/Chat"
+      ],
+      "confidence": 0.95,
+      "suggested_action": "You can proceed to interact with your agent using the chat API, or explore more API usage examples in the Lyzr docs."
+    },
+    "metadata": {
+      "agent_name": "Lyzr Support Agent",
+      "timestamp": "2024-06-12T13:34:09Z"
+    }
+  },
+  "is_actual_tested": true,
+  "test_timestamp": "2026-02-02T12:17:52.346008",
+  "test_message_used": "Hello, provide a sample response",
+  "actual_test_response": {
+    "status": "success",
+    "result": {
+      "answer": "Here is a sample response from the Lyzr API when you initiate a chat with an agent. For example, if you send a POST request to the chat endpoint with a sample message, you might receive:\n\n{\n  \"response\": \"Hello! How can I assist you today?\"\n}\n\nThis indicates that the agent is ready to engage and provide further assistance based on your queries. For more details on chatting with agents, refer to the official documentation.",
+      "sources": [
+        "https://docs.lyzr.ai/agent-apis/agents/Chat"
+      ],
+      "confidence": 0.95,
+      "suggested_action": "You can proceed to interact with your agent using the chat API, or explore more API usage examples in the Lyzr docs."
+    },
+    "metadata": {
+      "agent_name": "Lyzr Support Agent",
+      "timestamp": "2024-06-12T13:34:09Z"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "agent_name": "Lyzr Support Agent",
+  "agent_id": "69809580066158e77fdea161",
+  "test_message": "Tell me about the Agent API",
+  "expected_purpose": "assistant",
+  "timestamp": "2026-02-02T12:17:39.896195",
+  "is_valid_json": true,
+  "validation_errors": [],
+  "actual_response": {
+    "status": "success",
+    "result": {
+      "answer": "The Lyzr Agent API allows you to manage, create, and interact with AI agents programmatically. Key capabilities include retrieving all agents associated with a given API key, creating new agents with custom configurations, updating or deleting agents, and initiating conversations with agents. You can integrate your existing systems and build sophisticated, production-ready agentic workflows by leveraging these endpoints. The API is structured around RESTful calls, uses API key authentication, and returns JSON-formatted responses. Common endpoints include:\n\n- GET /v3/agents/: List all agents tied to your API key\n- POST /v3/agents/: Create a new agent by specifying properties like name, description, features, tools, and model configuration\n- Other endpoints: Update, delete, and interact with agents through chat\n\nSample usage and authentication information are clearly demonstrated in the Lyzr documentation, and you can find code examples for cURL and Python. If you need detailed fields and payload examples, please refer to the Agent API docs linked below.",
+      "sources": [
+        "https://docs.lyzr.ai/agent-apis/agents/Get Agent By API Key",
+        "https://docs.lyzr.ai/agent-apis/agents/Create Agent"
+      ],
+      "confidence": 0.95,
+      "suggested_action": "Review the API documentation for endpoint details and example usage. Contact support@lyzr.ai for advanced integration needs."
+    },
+    "metadata": {
+      "agent_name": "Lyzr Support Agent",
+      "timestamp": "2024-06-18T11:16:55Z"
+    }
+  },
+  "raw_response": "{\n  \"status\": \"success\",\n  \"result\": {\n    \"answer\": \"The Lyzr Agent API allows you to manage, create, and interact with AI agents programmatically. Key capabilities include retrieving all agents associated with a given API key, creating new agents with custom configurations, updating or deleting agents, and initiating conversations with agents. You can integrate your existing systems and build sophisticated, production-ready agentic workflows by leveraging these endpoints. The API is structured around RESTful calls, uses API key authentication, and returns JSON-formatted responses. Common endpoints include:\\n\\n- GET /v3/agents/: List all agents tied to your API key\\n- POST /v3/agents/: Create a new agent by specifying properties like name, description, features, tools, and model configuration\\n- Other endpoints: Update, delete, and interact with agents through chat\\n\\nSample usage and authentication information are clearly demonstrated in the Lyzr documentation, and you can find code examples for cURL and Python. If you need detailed fields and payload examples, please refer to the Agent API docs linked below.\",\n    \"sources\": [\n      \"https://docs.lyzr.ai/agent-apis/agents/Get Agent By API Key\",\n      \"https://docs.lyzr.ai/agent-apis/agents/Create Agent\"\n    ],\n    \"confidence\": 0.95,\n    \"suggested_action\": \"Review the API documentation for endpoint details and example usage. Contact support@lyzr.ai for advanced integration needs.\"\n  },\n  \"metadata\": {\n    \"agent_name\": \"Lyzr Support Agent\",\n    \"timestamp\": \"2024-06-18T11:16:55Z\"\n  }\n}"
+}

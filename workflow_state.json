@@ -1,0 +1,25 @@
+{
+  "workflow_status": "complete",
+  "agents": [
+    {
+      "agent_id": "69809580066158e77fdea161",
+      "name": "Lyzr Support Agent",
+      "status": "created",
+      "has_response_schema": true,
+      "schema_file": "response_schemas/lyzr_support_agent_response.json"
+    }
+  ],
+  "knowledge_bases": [
+    {
+      "rag_id": "6980956447177de38546e1f2",
+      "rag_name": "lyzrdocumentationknowledgebaseru1x",
+      "name": "Lyzr Documentation Knowledge Base",
+      "status": "crawling",
+      "urls_count": 5
+    }
+  ],
+  "next_steps": [
+    "UI generation",
+    "Agent testing (delegated to agent_testing sub-agent)"
+  ]
+}

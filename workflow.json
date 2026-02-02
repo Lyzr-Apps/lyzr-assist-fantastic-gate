@@ -1,0 +1,74 @@
+{
+  "workflow": {
+    "nodes": [
+      {
+        "id": "user_input",
+        "type": "Input",
+        "label": "User Question",
+        "nodeCategory": "input",
+        "position": { "x": 100, "y": 200 }
+      },
+      {
+        "id": "lyzr_support_agent",
+        "type": "Agent",
+        "label": "Lyzr Support Agent",
+        "nodeCategory": "agent",
+        "agentId": "69809580066158e77fdea161",
+        "position": { "x": 400, "y": 200 }
+      },
+      {
+        "id": "response_output",
+        "type": "Output",
+        "label": "Response with Documentation Links",
+        "nodeCategory": "end",
+        "position": { "x": 700, "y": 200 }
+      }
+    ],
+    "edges": [
+      {
+        "source": "user_input",
+        "target": "lyzr_support_agent"
+      },
+      {
+        "source": "lyzr_support_agent",
+        "target": "response_output"
+      }
+    ]
+  },
+  "agents": [
+    {
+      "agent_id": "69809580066158e77fdea161",
+      "name": "Lyzr Support Agent",
+      "type": "Single",
+      "description": "Answers user questions about Lyzr platform by searching documentation. Provides quick answers with links to detailed docs. When unable to answer, acknowledges limitations and suggests contacting Lyzr support team.",
+      "provider": "OpenAI",
+      "model": "gpt-4.1",
+      "temperature": 0.3,
+      "top_p": 1,
+      "has_knowledge_base": true,
+      "rag_id": "6980956447177de38546e1f2",
+      "rag_name": "lyzrdocumentationknowledgebaseru1x",
+      "trigger": "Send button on Chat Interface"
+    }
+  ],
+  "knowledge_bases": [
+    {
+      "rag_id": "6980956447177de38546e1f2",
+      "rag_name": "lyzrdocumentationknowledgebaseru1x",
+      "name": "Lyzr Documentation Knowledge Base",
+      "description": "Knowledge base containing Lyzr platform documentation, tutorials, model selection guides, API documentation, and getting started resources",
+      "crawled_urls": [
+        "https://docs.lyzr.ai/introduction/getting-started/intro",
+        "https://www.lyzr.ai/tutorials",
+        "https://docs.lyzr.ai/cookbooks/Choosing%20Model",
+        "https://docs.lyzr.ai/agent-lab/agents/api/Introduction",
+        "https://www.lyzr.ai/"
+      ]
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-02-02",
+    "workflow_type": "single_agent_with_kb",
+    "total_agents": 1
+  }
+}
